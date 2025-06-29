@@ -4,6 +4,7 @@
   "main": "/src/server.ts",
   "scripts": {
     "dev": "nodemon --exec ts-node src/server.ts",
+    "start": "node ./dist/server.js",
     "build": "rm -rf dist && tsc && cp package*.json dist/",
     "build:lambda": "npm run build && cd dist && npm ci --production && zip -r ../lambda.zip .",
     "test": "vitest",

@@ -12,8 +12,13 @@ app.use(morgan("combined"));
 app.use(express.json());
 
 app.use("/api/transactions", transactionRoutes);
+app.use("/dev/api/transactions", transactionRoutes);
 
 app.get("/health", (req, res) => {
+  res.status(200).json({ status: "OK", timestamp: new Date().toISOString() });
+});
+
+app.get("/dev/health", (req, res) => {
   res.status(200).json({ status: "OK", timestamp: new Date().toISOString() });
 });
 

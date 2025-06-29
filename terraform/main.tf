@@ -138,3 +138,30 @@ resource "aws_lambda_permission" "api_gateway_invoke" {
   principal     = "apigateway.amazonaws.com"
   source_arn    = "${aws_apigatewayv2_api.api.execution_arn}/*/*"
 }
+
+resource "aws_apigatewayv2_route" "health" {
+  api_id    = aws_apigatewayv2_api.api.id
+  route_key = "GET /health"
+  target    = "integrations/${aws_apigatewayv2_integration.lambda_integration.id}"
+}
+
+# Route para transactions base
+resource "aws_apigatewayv2_route" "transactions" {
+  api_id    = aws_apigatewayv2_api.api.id
+  route_key = "ANY /api/transactions"
+  target    = "integrations/${aws_apigatewayv2_integration.lambda_integration.id}"
+}
+
+# Route para transactions com ID
+resource "aws_apigatewayv2_route" "transactions_id" {
+  api_id    = aws_apigatewayv2_api.api.id
+  route_key = "ANY /api/transactions/{id}"
+  target    = "integrations/${aws_apigatewayv2_integration.lambda_integration.id}"
+}
+
+# Route catch-all (manter por último)
+resource "aws_apigatewayv2_route" "default" {
+  api_id    = aws_apigatewayv2_api.api.id
+  route_key = "$default"
+  target    = "integrations/${aws_apigatewayv2_integration.lambda_integration.id}"
+}
