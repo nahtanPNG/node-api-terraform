@@ -7,10 +7,13 @@ import { UpdateTransaction } from "../use-cases/UpdateTransaction";
 import { DeleteTransaction } from "../use-cases/DeleteTransaction";
 import { TransactionController } from "../interface-adapters/controllers/TransactionController";
 
-const dynamoClient = new DynamoDBClient({ region: "us-east-1" });
+const dynamoClient = new DynamoDBClient({
+  region: process.env.AWS_REGION || "us-east-1",
+});
+
 const transactionRepository = new DynamoTransactionRepository(
   dynamoClient,
-  "transactions"
+  process.env.DYNAMODB_TABLE || "transactions"
 );
 
 // Use Cases
