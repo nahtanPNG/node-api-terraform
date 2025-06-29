@@ -35,7 +35,7 @@ export class DynamoTransactionRepository implements TransactionRepository {
   async findById(id: string): Promise<Transaction | null> {
     const command = new GetCommand({
       TableName: this.tableName,
-      Key: { id: { S: id } },
+      Key: { id },
     });
 
     const result = await this.docClient.send(command);
@@ -43,10 +43,10 @@ export class DynamoTransactionRepository implements TransactionRepository {
     if (!result.Item) return null;
 
     return new Transaction(
-      parseFloat(result.Item.amount.N!),
-      result.Item.description.S!,
-      result.Item.type.S! as "income" | "expense",
-      result.Item.id.S!
+      result.Item.amount,
+      result.Item.description,
+      result.Item.type as "income" | "expense",
+      result.Item.id
     );
   }
 
