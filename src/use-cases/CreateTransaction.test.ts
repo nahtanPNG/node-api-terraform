@@ -5,7 +5,7 @@ import { TransactionRepository } from "../domain/repositories/TransactionReposit
 
 describe("CreateTransaction Use Case", () => {
   const mockRepository: TransactionRepository = {
-    create: vi.fn(),
+    save: vi.fn(),
     findById: vi.fn(),
     findAll: vi.fn(),
     update: vi.fn(),
@@ -14,7 +14,7 @@ describe("CreateTransaction Use Case", () => {
 
   it("should create a transaction successfully", async () => {
     mockRepository.findAll = vi.fn().mockResolvedValue([]);
-    mockRepository.create = vi
+    mockRepository.save = vi
       .fn()
       .mockImplementation((t) => Promise.resolve(t));
     const useCase = new CreateTransaction(mockRepository);
@@ -26,7 +26,7 @@ describe("CreateTransaction Use Case", () => {
     });
 
     expect(result.amount).toBe(100.5);
-    expect(mockRepository.create).toHaveBeenCalledOnce();
+    expect(mockRepository.save).toHaveBeenCalledOnce();
   });
 
   it("should throw error when daily limit exceeded", async () => {

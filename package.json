@@ -1,5 +1,7 @@
 {
   "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.839.0",
+    "@aws-sdk/lib-dynamodb": "^3.839.0",
     "aws-sdk": "^2.1692.0",
     "cors": "^2.8.5",
     "express": "^5.1.0",

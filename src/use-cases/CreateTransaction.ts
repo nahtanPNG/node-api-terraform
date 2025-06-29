@@ -20,7 +20,7 @@ export class CreateTransaction {
       data.type
     );
 
-    return await this.repository.create(transaction);
+    return await this.repository.save(transaction);
   }
 
   private async getTodayTransactionsCount(): Promise<number> {
