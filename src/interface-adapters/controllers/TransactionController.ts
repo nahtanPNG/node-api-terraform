@@ -3,6 +3,8 @@ import { CreateTransaction } from "../../use-cases/CreateTransaction";
 import { z } from "zod";
 import { GetAllTransactions } from "../../use-cases/GetAllTransactions";
 import { GetTransactionById } from "../../use-cases/GetTransactionById";
+import { UpdateTransaction } from "../../use-cases/UpdateTransaction";
+import { DeleteTransaction } from "../../use-cases/DeleteTransaction";
 
 const CreateTransactionSchema = z.object({
   amount: z.number(),
@@ -10,11 +12,19 @@ const CreateTransactionSchema = z.object({
   type: z.enum(["income", "expense"]),
 });
 
+const UpdateTransactionSchema = z.object({
+  amount: z.number().optional(),
+  description: z.string().optional(),
+  type: z.enum(["income", "expense"]).optional(),
+});
+
 export class TransactionController {
   constructor(
     private createTransactionUseCase: CreateTransaction,
     private getAllTransactionsUseCase: GetAllTransactions,
-    private getTransactionByIdUseCase: GetTransactionById
+    private getTransactionByIdUseCase: GetTransactionById,
+    private updateTransactionUseCase: UpdateTransaction,
+    private deleteTransactionUseCase: DeleteTransaction
   ) {}
 
   async create(req: Request, res: Response): Promise<void> {
@@ -60,6 +70,38 @@ export class TransactionController {
         success: true,
         data: transaction,
       });
+    } catch (error: any) {
+      res.status(404).json({
+        success: false,
+        error: error.message,
+      });
+    }
+  }
+
+  async update(req: Request, res: Response): Promise<void> {
+    try {
+      const { id } = req.params;
+      const data = UpdateTransactionSchema.parse(req.body);
+      const transaction = await this.updateTransactionUseCase.execute(id, data);
+
+      res.status(200).json({
+        success: true,
+        data: transaction,
+      });
+    } catch (error: any) {
+      res.status(400).json({
+        success: false,
+        error: error.message,
+      });
+    }
+  }
+
+  async delete(req: Request, res: Response): Promise<void> {
+    try {
+      const { id } = req.params;
+      await this.deleteTransactionUseCase.execute(id);
+
+      res.status(204).send();
     } catch (error: any) {
       res.status(404).json({
         success: false,
