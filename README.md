@@ -3,6 +3,7 @@
 A serverless REST API for managing financial transactions built with Node.js, TypeScript, and AWS services following Clean Architecture principles.
 
 ## 🏗️ AWS Infrastructure
+![Aws Infra](https://github.com/user-attachments/assets/cc1b54d9-3b1b-4e7a-bb7c-8ec6d2122edf)
 
 
 ## 🛠️ Tech Stack
