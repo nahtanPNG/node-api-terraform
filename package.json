@@ -1,4 +1,16 @@
 {
+  "name": "api-terraform",
+  "version": "1.0.0",
+  "main": "/src/server.ts",
+  "scripts": {
+    "dev": "nodemon --exec ts-node src/server.ts",
+    "build": "tsc",
+    "test": "vitest",
+    "test:watch": "vitest --watch"
+  },
+  "author": "nahtanpng",
+  "license": "ISC",
+  "description": "",
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.839.0",
     "@aws-sdk/lib-dynamodb": "^3.839.0",
@@ -21,14 +33,5 @@
     "ts-node": "^10.9.2",
     "typescript": "^5.8.3",
     "vitest": "^3.2.4"
-  },
-  "name": "api-terraform",
-  "version": "1.0.0",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "nahtanpng",
-  "license": "ISC",
-  "description": ""
+  }
 }
