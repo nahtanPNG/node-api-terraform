@@ -70,6 +70,8 @@ resource "aws_lambda_function" "api" {
   runtime       = "nodejs18.x"
   timeout       = 30
 
+  source_code_hash = filebase64sha256("../lambda.zip")
+
   environment {
     variables = {
       DYNAMODB_TABLE = aws_dynamodb_table.transactions.name
@@ -86,4 +88,53 @@ resource "aws_lambda_function" "api" {
     Name        = "${var.app_name}-${var.environment}"
     Environment = var.environment
   }
+}
+
+# API Gateway
+resource "aws_apigatewayv2_api" "api" {
+  name          = "${var.app_name}-${var.environment}"
+  protocol_type = "HTTP"
+  description   = "Transaction API"
+
+  cors_configuration {
+    allow_origins = ["*"]
+    allow_methods = ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+    allow_headers = ["content-type"]
+    max_age       = 300
+  }
+
+  tags = {
+    Name        = "${var.app_name}-${var.environment}"
+    Environment = var.environment
+  }
+}
+
+# Integration Lambda <-> API Gateway
+resource "aws_apigatewayv2_integration" "lambda_integration" {
+  api_id           = aws_apigatewayv2_api.api.id
+  integration_type = "AWS_PROXY"
+  integration_uri  = aws_lambda_function.api.invoke_arn
+}
+
+# Route catch-all
+resource "aws_apigatewayv2_route" "proxy_route" {
+  api_id    = aws_apigatewayv2_api.api.id
+  route_key = "ANY /{proxy+}"
+  target    = "integrations/${aws_apigatewayv2_integration.lambda_integration.id}"
+}
+
+# Stage (deployment)
+resource "aws_apigatewayv2_stage" "api_stage" {
+  api_id      = aws_apigatewayv2_api.api.id
+  name        = var.environment
+  auto_deploy = true
+}
+
+# Permissão para API Gateway invocar Lambda
+resource "aws_lambda_permission" "api_gateway_invoke" {
+  statement_id  = "AllowExecutionFromAPIGateway"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.api.function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_apigatewayv2_api.api.execution_arn}/*/*"
 }
