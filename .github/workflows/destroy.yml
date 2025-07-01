@@ -1,0 +1,67 @@
+name: 🔥 Destroy Infrastructure
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm_destroy:
+        description: 'Type "destroy" to confirm'
+        required: true
+        default: ""
+      environment:
+        description: "Environment to destroy"
+        required: true
+        default: "dev"
+        type: choice
+        options:
+          - dev
+          - staging
+          - prod
+
+jobs:
+  destroy:
+    runs-on: ubuntu-latest
+
+    if: github.event.inputs.confirm_destroy == 'destroy'
+
+    steps:
+      - name: 🚨 Starting Infrastructure Destruction
+        run: |
+          echo "🚨 ATTENTION: About to destroy ${{ github.event.inputs.environment }} environment"
+          echo "⏰ Started at: $(date)"
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.0.0
+
+      - name: Terraform Init
+        run: |
+          cd terraform
+          terraform init
+
+      - name: 🔍 Show what will be destroyed
+        run: |
+          cd terraform
+          echo "📋 Resources that will be DESTROYED:"
+          terraform plan -destroy
+
+      - name: 💥 Terraform Destroy
+        run: |
+          cd terraform
+          terraform destroy -auto-approve
+
+      - name: ✅ Destruction Complete
+        run: |
+          echo "✅ Infrastructure destroyed successfully!"
+          echo "💰 AWS costs should stop now"
+          echo "🔄 To redeploy: just push to main branch"
