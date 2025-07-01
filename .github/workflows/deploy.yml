@@ -1,0 +1,70 @@
+name: Deploy Transaction API
+
+# Quando executar
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# Onde executar
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Baixar o código
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 2. Configurar Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+          cache: "npm"
+
+      # 3. Instale as dependências
+      - name: Install dependencies
+        run: npm install
+
+      # 4. Execute os testes
+      - name: Run tests
+        run: npm test
+
+      # 5. Se os testes passaram, faça o build
+      - name: Build Lambda package
+        run: npm run build:lambda
+
+      # 6. Faça login na aws cli
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      # 7. Setup Terraform
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.0.0
+
+      # 8. Execute terraform init e plan
+      - name: Terraform Init
+        run: |
+          cd terraform
+          terraform init
+
+      - name: Terraform Plan
+        run: |
+          cd terraform
+          terraform plan
+        continue-on-error: true
+
+      # 9. Execute terraform apply (apenas na main)
+      - name: Terraform Apply
+        if: github.ref == 'refs/heads/main'
+        run: |
+          cd terraform
+          terraform apply -auto-approve
