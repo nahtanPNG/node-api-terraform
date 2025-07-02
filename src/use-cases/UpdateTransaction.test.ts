@@ -1,4 +1,3 @@
-// src/use-cases/UpdateTransaction.test.ts
 import { describe, it, expect, vi } from "vitest";
 import { UpdateTransaction } from "./UpdateTransaction";
 import { TransactionRepository } from "../domain/repositories/TransactionRepository";
@@ -31,8 +30,8 @@ describe("UpdateTransaction Use Case", () => {
 
     expect(result.amount).toBe(200);
     expect(result.description).toBe("New description");
-    expect(result.type).toBe("income"); // manteve o original
-    expect(result.id).toBe("test-id"); // manteve o ID
+    expect(result.type).toBe("income"); 
+    expect(result.id).toBe("test-id");
     expect(mockRepository.save).toHaveBeenCalledWith(result);
   });
 

@@ -1,4 +1,3 @@
-// src/use-cases/CreateTransaction.test.ts
 import { describe, it, expect, vi } from "vitest";
 import { CreateTransaction } from "./CreateTransaction";
 import { TransactionRepository } from "../domain/repositories/TransactionRepository";
